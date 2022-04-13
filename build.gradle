@@ -1,0 +1,59 @@
+plugins {
+    id("org.springframework.boot") version "2.5.2" apply false
+    id("io.spring.dependency-management") version "1.0.9.RELEASE"
+    id 'java'
+}
+
+group = 'com.shortandprecise'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+ext {
+    set('springCloudVersion', "2020.0.3")
+    set('resilience4jVersion', "1.7.0")
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    compileOnly 'org.projectlombok:lombok:1.18.4'
+    annotationProcessor 'org.projectlombok:lombok:1.18.4'
+    // resilience4j
+    compile "io.github.resilience4j:resilience4j-circuitbreaker:${resilience4jVersion}"
+    compile "io.github.resilience4j:resilience4j-reactor:${resilience4jVersion}"
+    compile "io.github.resilience4j:resilience4j-micrometer:${resilience4jVersion}"
+
+
+    //Test
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'commons-io:commons-io:2.6'
+    testImplementation ('org.springframework.boot:spring-boot-starter-test'){
+        exclude([group: 'junit', module:'junit'])
+    }
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params'
+    testImplementation 'org.junit.platform:junit-platform-runner'
+    testCompile 'org.junit.platform:junit-platform-commons'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
+
+    //WireMock
+    testImplementation 'com.github.tomakehurst:wiremock:2.25.1'
+    testImplementation 'io.rest-assured:rest-assured:4.1.2'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
