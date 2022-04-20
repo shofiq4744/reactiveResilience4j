@@ -1,7 +1,6 @@
 package com.example.springwebflax.controller;
 
 import com.example.springwebflax.service.CommentService;
-import com.example.springwebflax.service.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -14,22 +13,24 @@ import reactor.core.publisher.Mono;
 import java.util.*;
 
 @RestController
-public class CommentController {
+public class PostCommentController {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(CommentController.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(PostCommentController.class);
+    public static final String POST_URI = "https://jsonplaceholder.typicode.com/posts/1";
+    public static final String COMMENT_URI = "https://jsonplaceholder.typicode.com/posts/";
 
     private CommentService commentService;
-    public CommentController(CommentService commentService){
+    public PostCommentController(CommentService commentService){
         this.commentService = commentService;
     }
 
-    @GetMapping(value = "/comments",produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Mono<ResponseEntity<Map<String,Object>>> comments(){
+    @GetMapping(value = "/post/comments",produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Mono<ResponseEntity<Map<String,Object>>> showPostComments(){
 
-        return commentService.getComments(Util.POST_URI)
+        return commentService.getComments(POST_URI)
                 .flatMap(res-> Mono.just(res))
                 .flatMap(post->
-                        getComments().flatMap(comments->{
+                         getComments(post).flatMap(comments->{
                     Map<String,Object> item = new HashMap<>();
                     item.put("post",post);
                     item.put("comments",comments);
@@ -43,13 +44,14 @@ public class CommentController {
                 }).doFinally(rs->{
                     LOGGER.debug("INFO","Complete");
                 });
-
     }
 
-    private Mono<List<Object>>  getComments(){
+    private Mono<List<Object>>  getComments(Object post){
+        Map postMap = (Map)post;
+        Integer postId = Integer.valueOf(postMap.get("id").toString());
         Collection<Mono<Object>> item = new ArrayList<>();
-        for(int i=1;i<=20;i++){
-            item.add(commentService.getComments(Util.COMMET_URI+i)
+        for(int i=1;i<=6;i++){
+            item.add(commentService.getComments(COMMENT_URI+postId+"/comments")
                                 .flatMap(comment-> Mono.just(comment)));
         }
         return Flux.merge(item).collectList();

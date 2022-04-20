@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-
 import java.time.Duration;
 
 @Component
@@ -25,16 +24,16 @@ public class CircuitBreakerManager implements ApplicationRunner {
 	public void run(ApplicationArguments args) throws Exception {
 		CircuitBreakerConfig circuitBreakerConfig = CircuitBreakerConfig.custom()
 				.failureRateThreshold(60)
-				.slowCallRateThreshold(100)
-				.slowCallDurationThreshold(Duration.ofMillis(60000))
+				.slowCallRateThreshold(30)
+				.slowCallDurationThreshold(Duration.ofMillis(600))
 				.permittedNumberOfCallsInHalfOpenState(1)
 				.slidingWindowType(
 						CircuitBreakerConfig.SlidingWindowType.TIME_BASED)
 				.slidingWindowSize(10)
-				.minimumNumberOfCalls(2)
-				.waitDurationInOpenState(Duration.ofMillis(10000))
+				.minimumNumberOfCalls(3)
+				.waitDurationInOpenState(Duration.ofMillis(100000000))
 				.automaticTransitionFromOpenToHalfOpenEnabled(false)
-				.recordException(throwable -> true)
+				.recordException(throwable -> true)//all throwable are increase failure rate
 				.build();
 
 		CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker("webclient", circuitBreakerConfig);

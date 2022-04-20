@@ -36,11 +36,11 @@ public class CommentService {
                 .exchange()
                 .timeout(Duration.ofMillis(1000))
                 .flatMap(clientResponse -> {
-                    if (clientResponse.statusCode().isError()) {
+                   /* if (clientResponse.statusCode().isError()) {
                         throw new RuntimeException("Error");
                     }
                     System.out.println(String.format(
-                            "Thread %s", Thread.currentThread().getName()));
+                            "Thread %s", Thread.currentThread().getName()));*/
                     return clientResponse.bodyToMono(Object.class);
                 })
                 .onErrorResume(throwable -> {
@@ -52,10 +52,10 @@ public class CommentService {
                     return Mono.error(throwable);
                 })
                 .doOnSubscribe(sub->{
-                    //System.out.println("Subscribe start");
+                    System.out.println("Subscribe start");
                 })
                 .doOnError(err->{
-                    System.out.println("error");
+                   // System.out.println("error");
                 })
                 .doFinally(fn->{
                    // System.out.println("webclient final");

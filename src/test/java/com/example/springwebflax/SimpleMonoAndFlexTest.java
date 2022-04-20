@@ -31,7 +31,7 @@ public class SimpleMonoAndFlexTest {
     public void testDoWithSession2() throws Exception {
         Function<String, Mono<Integer>> fun1 = str -> Mono.fromCallable(() -> {
             System.out.println("start some long timed work");
-            //for demonstration we'll print some clock ticks
+            //for demonstration, we'll print some clock ticks
             for (int i = 1; i <= 10; i++) {
                 try {
                     Thread.sleep(1000);
